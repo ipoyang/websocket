@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hello web Socket</title>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+</head>
+<body>
+<input id="name">
+<button id="send">发送</button>
+<table id="response"></table>
+<script type="application/javascript">
+    var stompClient = null;
+    $(function () {
+        var ws = new SockJS("/test-websocket");
+        stompClient = Stomp.over(ws);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/hello', function (greeting) {
+                console.log("接收"+greeting)
+                $("#response").append("<tr><td>" + greeting.body + "</td></tr>");
+            });
+        })
+        $("#send").click(function () {
+            stompClient.send("/app/h", {}, $("#name").val());
+        })
+    })
+</script>
+</body>
+</html>
